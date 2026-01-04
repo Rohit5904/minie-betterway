@@ -1,8 +1,11 @@
+import { FiMinus, FiPlus } from "react-icons/fi";
+import { useCart } from "../context/CartContext";
 import Button from "./Button";
 import "../styles/components/ProductCard.css";
 
 export default function ProductCard({ product }) {
   const {
+    id,
     title,
     category,
     price,
@@ -12,6 +15,11 @@ export default function ProductCard({ product }) {
     images,
   } = product;
 
+  const { addToCart, cart, updateQuantity } = useCart();
+
+  const cartItem = cart.find((item) => item.id === id);
+  const quantityInCart = cartItem ? cartItem.quantity : 0;
+
   const isOutOfStock = availabilityStatus === "Out of Stock" || stock === 0;
   let badgeClass = "badge-in-stock";
   if (isOutOfStock) {
@@ -19,7 +27,25 @@ export default function ProductCard({ product }) {
   }
 
   const handleAddToCart = () => {
-    console.log(`Added to cart: ${title} (${product.id})`);
+    addToCart(product);
+  };
+
+  const handleIncrement = () => {
+    if (quantityInCart < stock) {
+      updateQuantity(id, quantityInCart + 1, stock);
+    } else {
+      alert("Cannot add more items. Stock limit reached.");
+    }
+  };
+
+  const handleDecrement = () => {
+    if (quantityInCart === 1) {
+      if (window.confirm("Do you want to remove this item from the cart?")) {
+        updateQuantity(id, 0, stock);
+      }
+    } else {
+      updateQuantity(id, quantityInCart - 1, stock);
+    }
   };
 
   return (
@@ -44,13 +70,34 @@ export default function ProductCard({ product }) {
 
         <div className="product-footer">
           <span className="product-price">Rs {price.toFixed(2)}</span>
-          <Button
-            onClick={handleAddToCart}
-            disabled={isOutOfStock}
-            variant={isOutOfStock ? "outline" : "primary"}
-          >
-            {isOutOfStock ? "Out of Stock" : "Add to Cart"}
-          </Button>
+
+          {quantityInCart > 0 ? (
+            <div className="card-qty-controls">
+              <button
+                className="card-qty-btn"
+                onClick={handleDecrement}
+                aria-label="Decrease quantity"
+              >
+                <FiMinus />
+              </button>
+              <span className="card-qty-value">{quantityInCart}</span>
+              <button
+                className="card-qty-btn"
+                onClick={handleIncrement}
+                aria-label="Increase quantity"
+              >
+                <FiPlus />
+              </button>
+            </div>
+          ) : (
+            <Button
+              onClick={handleAddToCart}
+              disabled={isOutOfStock}
+              variant={isOutOfStock ? "outline" : "primary"}
+            >
+              {isOutOfStock ? "Out of Stock" : "Add to Cart"}
+            </Button>
+          )}
         </div>
       </div>
     </article>
