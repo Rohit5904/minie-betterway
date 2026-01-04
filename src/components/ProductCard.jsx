@@ -43,7 +43,7 @@ export default function ProductCard({ product }) {
         </h3>
 
         <div className="product-footer">
-          <span className="product-price">${price.toFixed(2)}</span>
+          <span className="product-price">Rs {price.toFixed(2)}</span>
           <Button
             onClick={handleAddToCart}
             disabled={isOutOfStock}

@@ -1,0 +1,55 @@
+.search-form-home {
+  flex: 1;
+  min-width: 280px;
+  max-width: 400px;
+}
+
+.search-input-wrapper-home {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon-home {
+  position: absolute;
+  left: 1rem;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.search-input-home {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 2.8rem; /* Added right padding for clear btn */
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text);
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.search-input-home:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.search-clear-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--color-text);
+}

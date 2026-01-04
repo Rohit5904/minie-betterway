@@ -1,3 +1,4 @@
+import { Routes, Route, Navigate } from "react-router-dom";
 import Header from "./components/Header";
 import Home from "./pages/Home";
 import "./styles/App.css";
@@ -7,7 +8,10 @@ function App() {
     <div className="app-layout">
       <Header />
       <main className="main-content">
-        <Home />
+        <Routes>
+          <Route path="/" element={<Navigate to="/products" replace />} />
+          <Route path="/products" element={<Home />} />
+        </Routes>
       </main>
     </div>
   );
