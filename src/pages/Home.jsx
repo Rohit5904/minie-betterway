@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import useDebounce from "../hooks/useDebounce";
 import ProductCard from "../components/ProductCard";
 import Search from "../components/Search";
 import Sort from "../components/Sort";
@@ -19,22 +20,19 @@ export default function Home() {
   const sortOrder = searchParams.get("order");
 
   const [searchTerm, setSearchTerm] = useState(urlSearchQuery);
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setSearchParams((prev) => {
-        const newParams = new URLSearchParams(prev);
-        if (searchTerm.trim()) {
-          newParams.set("q", searchTerm.trim());
-        } else {
-          newParams.delete("q");
-        }
-        return newParams;
-      });
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm, setSearchParams]);
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      if (debouncedSearchTerm.trim()) {
+        newParams.set("q", debouncedSearchTerm.trim());
+      } else {
+        newParams.delete("q");
+      }
+      return newParams;
+    });
+  }, [debouncedSearchTerm, setSearchParams]);
 
   useEffect(() => {
     if (urlSearchQuery !== searchTerm) {
@@ -59,6 +57,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController();
     const fetchProducts = async () => {
       try {
         setLoading(true);
@@ -81,7 +80,7 @@ export default function Home() {
 
         url += `?${params.toString()}`;
 
-        const response = await fetch(url);
+        const response = await fetch(url, { signal: controller.signal });
         const data = await response.json();
 
         let fetchedProducts = data.products || [];
@@ -101,13 +100,19 @@ export default function Home() {
 
         setProducts(fetchedProducts);
       } catch (err) {
-        console.error("Error loading products:", err);
+        if (err.name !== "AbortError") {
+          console.error("Error loading products:", err);
+        }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchProducts();
+
+    return () => controller.abort();
   }, [selectedCategory, sortOrder, urlSearchQuery]);
 
   const toggleFilter = () => {

@@ -30,14 +30,20 @@ export default function Cart() {
         {cart.map((item) => (
           <div key={item.id} className="cart-item">
             <img
-              src={item.thumbnail}
+              src={
+                item.thumbnail ||
+                (item.images && item.images[0]) ||
+                "https://via.placeholder.com/80"
+              }
               alt={item.title}
               className="cart-item-thumbnail"
             />
 
             <div className="cart-item-details">
               <h3 className="cart-item-title">{item.title}</h3>
-              <p className="cart-item-price">Rs {item.price.toFixed(2)}</p>
+              <p className="cart-item-price">
+                Rs {item.price?.toFixed(2) || "0.00"}
+              </p>
             </div>
 
             <div className="cart-item-controls">
@@ -104,7 +110,7 @@ export default function Cart() {
           <span>Total</span>
           <span>Rs {totalPrice.toFixed(2)}</span>
         </div>
-        <Button variant="primary" style={{ width: "100%", maxWidth: "300px" }}>
+        <Button variant="primary" className="checkout-btn">
           Checkout
         </Button>
       </div>
